@@ -137,6 +137,56 @@ struct CircleEffect : IEffect {
 	}
 };
 
+struct LineEffect : IEffect {
+
+	double transitionTime;
+
+	Array<std::pair<Point, Point>> lines;
+
+	LineEffect(const MillisecondsF& transitionTime) {
+		this->transitionTime = static_cast<int32>(transitionTime.count()) / 1000.0;
+
+		const Size size = Window::ClientRect().size;
+		lines.resize(size.y);
+
+		for (int i = 0; i < size.y; i++)
+		{
+			//1/3で横幅*2が左に移動する
+			lines[i].first.x = size.x + Random(size.x / 2, size.x);
+			lines[i].first.y = i;
+
+			//2/3で横幅*4を左に移動させる
+			lines[i].second.x = lines[i].first.x + size.x * 2 * 2;
+			lines[i].second.y = i;
+		}
+
+	}
+
+	bool update(double t) override {
+
+		if (t >= transitionTime)
+		{
+			return false;
+		}
+
+		const Size size = Window::ClientRect().size;
+		const double half = transitionTime / 2;
+		const double limit = transitionTime / 3;
+		const double speed = size.x * 2 / limit;
+
+		//フェードイン
+		//フェードアウト
+		for (const auto& line : lines)
+		{
+			const Point pos(static_cast<int>(speed*t), 0);
+
+			Line(line.first - pos, line.second - pos).draw();
+		}
+
+		return true;
+	}
+};
+
 struct CutEffect : IEffect {
 
 	double transitionTime;
@@ -235,6 +285,10 @@ struct Scene01 : public MyApp::Scene {
 			changeScene(U"Scene02",2s);
 		} });
 		selectScene.push_back({ Key3, [&]() {
+			sceneEffect.add<LineEffect>(2s);
+			changeScene(U"Scene02",2s);
+		} });
+		selectScene.push_back({ Key4, [&]() {
 			sceneEffect.add<CutEffect>(2s);
 			changeScene(U"Scene02",2s);
 		} });
@@ -285,6 +339,10 @@ struct Scene02 : public MyApp::Scene {
 			changeScene(U"Scene01",2s);
 		} });
 		selectScene.push_back({ Key3, [&]() {
+			sceneEffect.add<LineEffect>(2s);
+			changeScene(U"Scene01",2s);
+		} });
+		selectScene.push_back({ Key4, [&]() {
 			sceneEffect.add<CutEffect>(2s);
 			changeScene(U"Scene01",2s);
 		} });
