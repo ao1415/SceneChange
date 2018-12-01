@@ -1,15 +1,19 @@
 ﻿#include <Siv3D.hpp>
 #include <HamFramework.hpp>
 
+//切り替えエフェクト用のEffectクラスを共有で持つ
 struct GameData {
 	Effect fadeEffect;
 };
 
 using MyApp = SceneManager<String, GameData>;
 
+//1キーに割り当てたエフェクト
 struct BoxEffect : IEffect {
 
+	//フェードイン/アウト含めた切り替え時間
 	double transitionTime;
+	//各箇所でボックスが発生する時間
 	Grid<double> boxRadius;
 
 	BoxEffect(const MillisecondsF& transitionTime) {
@@ -81,8 +85,10 @@ struct BoxEffect : IEffect {
 	}
 };
 
+//2キーに割り当てたエフェクト
 struct CircleEffect : IEffect {
 
+	//フェードイン/アウト含めた切り替え時間
 	double transitionTime;
 
 	CircleEffect(const MillisecondsF& transitionTime) {
@@ -137,10 +143,13 @@ struct CircleEffect : IEffect {
 	}
 };
 
+//3キーに割り当てたエフェクト
 struct LineEffect : IEffect {
 
+	//フェードイン/アウト含めた切り替え時間
 	double transitionTime;
 
+	//切り替え用の線の初期位置
 	Array<std::pair<Point, Point>> lines;
 
 	LineEffect(const MillisecondsF& transitionTime) {
@@ -187,10 +196,13 @@ struct LineEffect : IEffect {
 	}
 };
 
+//4キーに割り当てたエフェクト
 struct CutEffect : IEffect {
 
+	//フェードイン/アウト含めた切り替え時間
 	double transitionTime;
 
+	//フェードアウト用のフェードイン画像
 	DynamicTexture fadeImage;
 
 	CutEffect(const MillisecondsF& transitionTime) {
@@ -276,6 +288,7 @@ struct Scene01 : public MyApp::Scene {
 
 		auto& sceneEffect = getData().fadeEffect;
 
+		//1～4キーにシーン切り替えとエフェクトを割り当てる
 		selectScene.push_back({ Key1, [&]() {
 			sceneEffect.add<BoxEffect>(2s);
 			changeScene(U"Scene02",2s);
@@ -295,6 +308,7 @@ struct Scene01 : public MyApp::Scene {
 
 	}
 
+	//フェードイン/アウトを上書きしてさせないようにする
 	void drawFadeIn(double) const override { draw(); }
 	void drawFadeOut(double) const override { draw(); }
 
@@ -319,7 +333,10 @@ struct Scene01 : public MyApp::Scene {
 
 	}
 
+	//描画用変数
 	double r = 0;
+
+	//切り替え方法を格納する
 	Array<std::pair<Key, std::function<void(void)>>> selectScene;
 
 };
@@ -330,6 +347,7 @@ struct Scene02 : public MyApp::Scene {
 
 		auto& sceneEffect = getData().fadeEffect;
 
+		//1～4キーにシーン切り替えとエフェクトを割り当てる
 		selectScene.push_back({ Key1, [&]() {
 			sceneEffect.add<BoxEffect>(2s);
 			changeScene(U"Scene01",2s);
@@ -349,6 +367,7 @@ struct Scene02 : public MyApp::Scene {
 
 	}
 
+	//フェードイン/アウトを上書きしてさせないようにする
 	void drawFadeIn(double) const override { draw(); }
 	void drawFadeOut(double) const override { draw(); }
 
@@ -373,7 +392,10 @@ struct Scene02 : public MyApp::Scene {
 
 	}
 
+	//描画用変数
 	double r = 0;
+
+	//切り替え方法を格納する
 	Array<std::pair<Key, std::function<void(void)>>> selectScene;
 
 };
@@ -391,10 +413,12 @@ void Main() {
 
 	while (System::Update())
 	{
+		//シーンを動かす
 		if (!manager.update())
 		{
 			break;
 		}
+		//切り替え用のエフェクトを動かす
 		p->fadeEffect.update();
 	}
 }
