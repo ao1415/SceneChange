@@ -3,7 +3,7 @@ __このリポジトリは[Siv3D AdventCalendar 2018](https://qiita.com/advent-c
 
 シーン切り替えをエフェクトで行うサンプルです
 
-動作環境
+作成環境
 - Visual Studio 2017
 - OpenSiv3D(0.3.1)
 
